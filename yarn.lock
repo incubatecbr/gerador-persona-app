@@ -5013,6 +5013,11 @@ react-native-safe-area-view@^0.14.1:
   dependencies:
     debounce "^1.2.0"
 
+react-native-share@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-1.2.1.tgz#3756a3cf383c1489a6a0edf2b529ec025ee8f8f7"
+  integrity sha512-V9q1FM+LuYJ65qN3k6BLWs17mIbJCzGyMOhF3rb4MIQXdJfCUbtkDX9aaV86PzcsL1EudCA53HVTJBmWPDed0Q==
+
 react-native-tab-view@^1.2.0, react-native-tab-view@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-1.4.1.tgz#f113cd87485808f0c991abec937f70fa380478b9"
@@ -5398,6 +5403,11 @@ rimraf@~2.2.6:
   version "2.2.8"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.2.8.tgz#e439be2aaee327321952730f99a8929e4fc50582"
   integrity sha1-5Dm+Kq7jJzIZUnMPmaiSnk/FBYI=
+
+rn-pdf-generator@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/rn-pdf-generator/-/rn-pdf-generator-1.0.12.tgz#27f9e305b4ba882c8c3c579d6d38ebc1f7178fe4"
+  integrity sha512-f0DDjWCPZjkwaTXGB/tpLWIDUiJK9Rrl8Q88b1yGUkVCuwg8On49vEj9n40cVDsRADg4vYQmuVD9v0yS/6hwCw==
 
 rsvp@^3.3.3:
   version "3.6.2"

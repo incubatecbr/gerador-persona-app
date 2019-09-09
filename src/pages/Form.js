@@ -2,16 +2,17 @@ import React, { Component, Fragment } from 'react';
 import { View, Text, Image, TextInput, StyleSheet, ScrollView, Button, Picker, Alert, TouchableOpacity, Platform, PermissionsAndroid, FlatList } from 'react-native';
 import logo from '../assets/img/logo.png';
 import arrImages from './img64';
-import PDF  from 'rn-pdf-generator';
+import PDF from 'rn-pdf-generator';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as yup from 'yup';
 import { Formik } from 'formik';
+import Share from 'react-native-share';
 
 export default class Form extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            filePath: '',
+            uri: '',
             spinner: false,
             avatar: [
                 { id: 0, display: "Avatar 1", name: "homem1", image: require("../assets/img/homem1.png") },
@@ -35,8 +36,8 @@ export default class Form extends React.Component {
         const imgSelected = arrImages.filter(({ name }) => name == data.avatar);
         const imgRD = arrImages.filter(({ name }) => name == 'logoReferencia');
 
-        const htmlPDF = `<div style="margin: 0; padding: 50px; text-align: center;">
-                    <img src="${imgSelected[0].base64}" style="width: 260px; height: 260px;">
+        const htmlPDF = `<div style="margin: 0; padding: 10px; text-align: center;">
+                    <img src="${imgSelected[0].base64}" style="width: 200px; height: 200px;">
                     <h1 style="color:#00db5e;">${data.nome}</h1>
                     <h2 style="color:grey;">${data.cargo}</h2>
                         <div style="text-align: left;">
@@ -49,25 +50,41 @@ export default class Form extends React.Component {
                             <p style="font-size: 1.2em; font-weight: 700;  line-height: .4;">Desafios: <span style="font-weight: 400;">${data.desafio}</span> </p>
                             <p style="font-size: 1.2em; font-weight: 700;  line-height: .4;">Como minha empresa pode ajudá-lá: <span style="font-weight: 400">${data.desafio}</span> </p>
                         </div>
-                        <img src='${imgRD[0].base64}' style="width: 210px; height: auto; margin-top: 20px;">
+                        <img src='${imgRD[0].base64}' style="width: 210px; height: auto; margin-top: 10px;">
                     </div>`;
 
         PDF.fromHTML(htmlPDF, `http://localhost`).then(data => {
-            console.log(data);
-            this.setState({ uri: `data:application/pdf;base64,${data}` });
+            //console.log(data);
+            this.setState({ uri: `data:application/pdf;base64,${data}` }, () => {this.sharePdfFile()});
+            this.setState({spinner: false});
         }).catch(err => {
             console.log('error->', err);
         });
-        //this.setState({ filePath: file.filePath });
-        //this.setState({ spinner: false });
-        //alert('Arquivo criado, por favor verifique na Documentos/Docs presente em seu cartão de memoria!');
+
     }
+
+    sharePdfFile = async () => {
+        //this.createPDF();
+        const shareOptions = {
+            title: 'PersonaGenerator',
+            url: this.state.uri,
+        };
+
+        try {
+            const ShareResponse = await Share.open(shareOptions);
+            setResult(JSON.stringify(ShareResponse, null, 2));
+            console.log('setResult end.');
+        } catch (error) {
+            console.log('Error =>', error);
+            setResult('error: '.concat(getErrorString(error)));
+        }
+        this.setState({ uri: '' });
+        console.log('finish');
+    };
 
     controllActions = (data) => {
         this.setState({ spinner: true });//show spinner
         this.createPDF(data);
-        this.setState({ spinner: false });//hide        
-        Alert.alert('OK');
     }
 
     render() {
