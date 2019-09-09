@@ -56,7 +56,6 @@ export default class Form extends React.Component {
         PDF.fromHTML(htmlPDF, `http://localhost`).then(data => {
             //console.log(data);
             this.setState({ uri: `data:application/pdf;base64,${data}` }, () => {this.sharePdfFile()});
-            this.setState({spinner: false});
         }).catch(err => {
             console.log('error->', err);
         });
@@ -64,7 +63,6 @@ export default class Form extends React.Component {
     }
 
     sharePdfFile = async () => {
-        //this.createPDF();
         const shareOptions = {
             title: 'PersonaGenerator',
             url: this.state.uri,
@@ -73,13 +71,13 @@ export default class Form extends React.Component {
         try {
             const ShareResponse = await Share.open(shareOptions);
             setResult(JSON.stringify(ShareResponse, null, 2));
-            console.log('setResult end.');
+            //console.log('setResult end.');
         } catch (error) {
-            console.log('Error =>', error);
+            //console.log('Error =>', error);
             setResult('error: '.concat(getErrorString(error)));
         }
+        this.setState({spinner: false});
         this.setState({ uri: '' });
-        console.log('finish');
     };
 
     controllActions = (data) => {
