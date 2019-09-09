@@ -3,9 +3,9 @@ import { View, Text, Image, TextInput, StyleSheet, ScrollView, Button, Picker, A
 import logo from '../assets/img/logo.png';
 import arrImages from './img64';
 // import RNHTMLtoPDF from 'react-native-html-to-pdf';
-// import Spinner from 'react-native-loading-spinner-overlay';
-// import * as yup from 'yup';
-// import { Formik } from 'formik';
+import Spinner from 'react-native-loading-spinner-overlay';
+import * as yup from 'yup';
+import { Formik } from 'formik';
 
 export default class Form extends React.Component {
     constructor(props) {
@@ -14,12 +14,12 @@ export default class Form extends React.Component {
             filePath: '',
             spinner: false,
             avatar: [
-                { id: 0, name: "homem1",  image: require("../assets/img/homem1.png") },
-                { id: 1, name: "homem2",  image: require("../assets/img/homem2.png") },
-                { id: 2, name: "homem3",  image: require("../assets/img/homem3.png") },
-                { id: 3, name: "mulher1", image: require("../assets/img/mulher1.png")},
-                { id: 4, name: "mulher2", image: require("../assets/img/mulher2.png")},
-                { id: 5, name: "mulher3", image: require("../assets/img/mulher3.png")}
+                { id: 0, display:"Avatar 1", name: "homem1" ,  image: require("../assets/img/homem1.png") },
+                { id: 1, display:"Avatar 2", name: "homem2" ,  image: require("../assets/img/homem2.png") },
+                { id: 2, display:"Avatar 3", name: "homem3" ,  image: require("../assets/img/homem3.png") },
+                { id: 3, display:"Avatar 4", name: "mulher1",  image: require("../assets/img/mulher1.png")},
+                { id: 4, display:"Avatar 5", name: "mulher2",  image: require("../assets/img/mulher2.png")},
+                { id: 5, display:"Avatar 6", name: "mulher3",  image: require("../assets/img/mulher3.png")}
             ],
             selectedItem: null
         };
@@ -29,47 +29,6 @@ export default class Form extends React.Component {
     static navigationOptions = {
         headerTitle: (<Image source={logo} style={{ marginHorizontal: 50 }} />)
     };
-
-    submitForm(data){
-        console.log(arrImages);
-        const img64 = arrImages.filter( ({name}) => name == data.avatar);
-        console.log(img64);
-    }
-
-
-    //função responsavel por solicitar a permissão de escrita do usuario
-    askPermissionUser(data) {
-        var that = this;
-        async function requestExternalWritePermission() {
-            try {
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                    {
-                        title: 'Gerador de persona request External Storage Write Permission',
-                        message: 'Gerador de persona needs access to Storage data in your SD Card ',
-                    }
-                );
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    //caso permita, chama função criar o pdf
-
-                    that.createPDF(data);
-                    //alert('Arquivo criado, por favor verifique na Documentos/Docs presente em seu cartão de memoria!');
-                } else {
-                    alert('Permissão negada!');
-                    return false;
-                }
-            } catch (err) {
-                alert('Problema com permissão para escrita.', err);
-                //console.warn(err);
-            }
-        }
-        //Chamando a função
-        if (Platform.OS === 'android') {
-            requestExternalWritePermission();
-        } else {
-            //this.createPDF(data);
-        }
-    }
 
     //Função responsavel por criar o PDF.
     async createPDF(data) {
@@ -252,7 +211,7 @@ export default class Form extends React.Component {
                                             }}>
                                             <View style={styles.divAvatar} onPress={() => Alert.alert(item.id)}>
                                                 <Image source={item.image} style={[styles.imgAvatar, (this.state.selectedItem === item.id) ? styles.activeAvatar : null]}></Image>
-                                                <Text>{item.name}</Text>
+                                                <Text>{item.display}</Text>
                                             </View>
                                         </TouchableOpacity>
                                     }

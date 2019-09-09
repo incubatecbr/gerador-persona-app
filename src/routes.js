@@ -3,7 +3,7 @@ import { createStackNavigator, createAppContainer } from "react-navigation";
 import { Image, StyleSheet } from 'react-native';
 
 import Start from './pages/Start';
-//import Form from './pages/Form';
+import Form from './pages/Form';
 import logo from './assets/img/logo.png';
 
 const styles = StyleSheet.create({
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
 
 const AppNavigator = createStackNavigator({
   Start: Start,
-  //Form: Form
+  Form: Form
 },
 
   {
