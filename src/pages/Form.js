@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { View, Text, Image, TextInput, StyleSheet, ScrollView, Button, Picker, Alert, TouchableOpacity, Platform, PermissionsAndroid, FlatList } from 'react-native';
 import logo from '../assets/img/logo.png';
 import arrImages from './img64';
-// import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import PDF  from 'rn-pdf-generator';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -14,12 +14,12 @@ export default class Form extends React.Component {
             filePath: '',
             spinner: false,
             avatar: [
-                { id: 0, display:"Avatar 1", name: "homem1" ,  image: require("../assets/img/homem1.png") },
-                { id: 1, display:"Avatar 2", name: "homem2" ,  image: require("../assets/img/homem2.png") },
-                { id: 2, display:"Avatar 3", name: "homem3" ,  image: require("../assets/img/homem3.png") },
-                { id: 3, display:"Avatar 4", name: "mulher1",  image: require("../assets/img/mulher1.png")},
-                { id: 4, display:"Avatar 5", name: "mulher2",  image: require("../assets/img/mulher2.png")},
-                { id: 5, display:"Avatar 6", name: "mulher3",  image: require("../assets/img/mulher3.png")}
+                { id: 0, display: "Avatar 1", name: "homem1", image: require("../assets/img/homem1.png") },
+                { id: 1, display: "Avatar 2", name: "homem2", image: require("../assets/img/homem2.png") },
+                { id: 2, display: "Avatar 3", name: "homem3", image: require("../assets/img/homem3.png") },
+                { id: 3, display: "Avatar 4", name: "mulher1", image: require("../assets/img/mulher1.png") },
+                { id: 4, display: "Avatar 5", name: "mulher2", image: require("../assets/img/mulher2.png") },
+                { id: 5, display: "Avatar 6", name: "mulher3", image: require("../assets/img/mulher3.png") }
             ],
             selectedItem: null
         };
@@ -31,12 +31,11 @@ export default class Form extends React.Component {
     };
 
     //Função responsavel por criar o PDF.
-    async createPDF(data) {
-        const imgSelected = arrImages.filter( ({name}) => name == data.avatar);
-        const imgRD = arrImages.filter( ({name}) => name == 'logoReferencia');
+    createPDF = (data) => {
+        const imgSelected = arrImages.filter(({ name }) => name == data.avatar);
+        const imgRD = arrImages.filter(({ name }) => name == 'logoReferencia');
 
-        this.setState({ spinner: true });//show spinner
-        let htmlPDF = `<div style="margin: 0; padding: 50px; text-align: center;">
+        const htmlPDF = `<div style="margin: 0; padding: 50px; text-align: center;">
                     <img src="${imgSelected[0].base64}" style="width: 260px; height: 260px;">
                     <h1 style="color:#00db5e;">${data.nome}</h1>
                     <h2 style="color:grey;">${data.cargo}</h2>
@@ -53,18 +52,22 @@ export default class Form extends React.Component {
                         <img src='${imgRD[0].base64}' style="width: 210px; height: auto; margin-top: 20px;">
                     </div>`;
 
-        let options = {
-            //Conteudo html
-            html: htmlPDF,
-            //Nome pdf
-            fileName: 'pdfNew5',
-            //Onde salvará
-            directory: 'Documents',
-        };
-        let file = await RNHTMLtoPDF.convert(options);
-        this.setState({ filePath: file.filePath });
-        this.setState({ spinner: false });
-        alert('Arquivo criado, por favor verifique na Documentos/Docs presente em seu cartão de memoria!');
+        PDF.fromHTML(htmlPDF, `http://localhost`).then(data => {
+            console.log(data);
+            this.setState({ uri: `data:application/pdf;base64,${data}` });
+        }).catch(err => {
+            console.log('error->', err);
+        });
+        //this.setState({ filePath: file.filePath });
+        //this.setState({ spinner: false });
+        //alert('Arquivo criado, por favor verifique na Documentos/Docs presente em seu cartão de memoria!');
+    }
+
+    controllActions = (data) => {
+        this.setState({ spinner: true });//show spinner
+        this.createPDF(data);
+        this.setState({ spinner: false });//hide        
+        Alert.alert('OK');
     }
 
     render() {
@@ -72,7 +75,7 @@ export default class Form extends React.Component {
             <ScrollView>
                 <View style={styles.container}>
                     <Text style={styles.textWar}>Preencha todos os campos abaixo e selecione um avatar para gerar sua peronsa!</Text>
-                    <Formik initialValues={{ nome: '', sexo: '', idade: '', cargo: '', empresa: '', escolaridade: '', comunicacao: '', objetivo: '', desafio: '', helper: '', avatar: '' }} onSubmit={values => this.askPermissionUser(values)}
+                    <Formik initialValues={{ nome: '', sexo: '', idade: '', cargo: '', empresa: '', escolaridade: '', comunicacao: '', objetivo: '', desafio: '', helper: '', avatar: '' }} onSubmit={values => this.controllActions(values)}
                         validationSchema={yup.object().shape({
                             nome: yup
                                 .string()
@@ -197,15 +200,15 @@ export default class Form extends React.Component {
                                     <Text style={styles.errorMsg}>{errors.helper}</Text>
                                 }
 
-                                <FlatList 
+                                <FlatList
                                     extraData={this.state.selectedItem}
-                                    data={this.state.avatar} 
-                                    numColumns={3} 
+                                    data={this.state.avatar}
+                                    numColumns={3}
                                     keyExtractor={item => item.id.toString()}
                                     renderItem={({ item }) =>
                                         <TouchableOpacity style={styles.touch}
                                             onPress={() => {
-                                                this.setState({selectedItem: item.id});
+                                                this.setState({ selectedItem: item.id });
                                                 handleChange('avatar')(String(item.name));
                                                 setFieldTouched('avatar', item.name);
                                             }}>
