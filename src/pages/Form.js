@@ -3,7 +3,7 @@ import { View, Text, Image, TextInput, StyleSheet, ScrollView, Button, Picker, A
 import logo from '../assets/img/logo.png';
 import arrImages from './img64';
 import PDF from 'rn-pdf-generator';
-import Spinner from 'react-native-loading-spinner-overlay';
+//import Spinner from 'react-native-loading-spinner-overlay';
 import * as yup from 'yup';
 import { Formik } from 'formik';
 import Share from 'react-native-share';
@@ -12,8 +12,8 @@ export default class Form extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            modalVisible: false,
             uri: '',
-            spinner: false,
             avatar: [
                 { id: 0, display: "Avatar 1", name: "homem1", image: require("../assets/img/homem1.png") },
                 { id: 1, display: "Avatar 2", name: "homem2", image: require("../assets/img/homem2.png") },
@@ -55,7 +55,14 @@ export default class Form extends React.Component {
 
         PDF.fromHTML(htmlPDF, `http://localhost`).then(data => {
             //console.log(data);
-            this.setState({ uri: `data:application/pdf;base64,${data}`});
+            this.setState({ uri: `data:application/pdf;base64,${data}` }, () => {
+                this.setState({ spinner: false }, () => {
+                    this.props.navigation.navigate('Share', {
+                        teste: this.state.uri,
+                        item: 1,
+                    });
+                });
+            });
         }).catch(err => {
             console.log('error->', err);
         });
@@ -83,17 +90,20 @@ export default class Form extends React.Component {
         this.setState({ uri: '' });
     };
 
+    setModal = (visible) => {
+        this.setState({modalVisible: visible});
+    }
+
     controllActions = (data) => {
-        console.log('controllAction..');
         this.setState({ spinner: true });//show spinner
         this.createPDF(data);
-        this.setState({ spinner: false }, () => { 
-            this.props.navigation.navigate('Share', {
-                teste: this.state.uri,
-                item: 1,
-            });
-        });
-        
+        // this.setState({ spinner: false }, () => { 
+        //     this.props.navigation.navigate('Share', {
+        //         teste: this.state.uri,
+        //         item: 1,
+        //     });
+        // });
+
 
         //console.log('call navigation..');
 
@@ -258,9 +268,24 @@ export default class Form extends React.Component {
                                         onPress={handleSubmit}
                                     />
                                 </View>
+                                
                                 {/* SPINNER LOADING BEFORE CLICK BUTTOM */}
-                                <Spinner visible={this.state.spinner} textContent={'Aguarde...'} textStyle={{ color: "#FFF" }} overlayColor={"rgba(96, 96, 96, 0.85)"} />
-
+                                <Modal
+                                    animationType="fade"
+                                    transparent={false}
+                                    visible={this.state.modalVisible}
+                                    onRequestClose={() => {
+                                        Alert.alert('Modal has been closed.');
+                                    }}>
+                                    <View style={styles.wrapper}>
+                                        <View style={styles.modalContainer}>
+                                            <ActivityIndicator size="large" color="#FFFF" />
+                                            <Text style={styles.modalText}>Aguarde...</Text>
+                                        </View>
+                                        <Button title="Close modal" onPress={() => this.setModal(!this.state.modalVisible)} />
+                                    </View>
+                                </Modal>
+                                {/* SPINNER LOADING BEFORE CLICK BUTTOM */}
                             </Fragment>
                         )}
                     </Formik>
@@ -273,10 +298,10 @@ export default class Form extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    borderError: {
+    borderError:{
         borderColor: "red",
     },
-    select: {
+    select:{
         fontFamily: 'sans-serif-condensed',
         fontSize: 12,
         backgroundColor: 'rgba(49,118,184, 0.3)',
@@ -284,7 +309,7 @@ const styles = StyleSheet.create({
         height: 35,
         marginVertical: 10,
     },
-    input: {
+    input:{
         fontFamily: 'sans-serif-condensed',
         borderColor: "#3176B8",
         borderWidth: 1,
@@ -292,69 +317,69 @@ const styles = StyleSheet.create({
         height: 40,
         marginVertical: 10,
     },
-    container: {
+    container:{
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    imgBox: {
-        marginTop: 5,
-        marginBottom: 10,
-        width: 90,
-        height: 90,
-    },
-
-    textWar: {
+    textWar:{
         marginTop: 7,
         textAlign: 'center',
         fontFamily: 'sans-serif-condensed',
         fontSize: 15,
         marginBottom: 10,
     },
-    space: {
-        margin: 20,
-    },
-    text: {
+    text:{
         fontFamily: 'sans-serif-condensed',
         fontSize: 14,
     },
-    txtPersona: {
+    txtPersona:{
         color: '#3176B8',
         fontWeight: 'bold',
     },
-    errorMsg: {
+    errorMsg:{
         marginTop: -10,
         marginBottom: 20,
         fontSize: 10,
         color: 'red',
     },
-    imgAvatar: {
+    imgAvatar:{
         borderColor: '#3176B8',
         borderRadius: 39,
         margin: 10,
         width: 80,
         height: 80,
     },
-    divAvatar: {
+    divAvatar:{
         alignItems: 'center',
     },
-    activeAvatar: {
+    activeAvatar:{
         borderWidth: 3,
         borderColor: '#3176B8',
         borderRadius: 39,
     },
-    teste: {
-        borderWidth: 3,
-        borderColor: '#3176B8',
-    },
-    btn: {
+    btn:{
         marginVertical: 20,
     },
-    spinnerTextStyle: {
-        color: '#3176B8',
-        fontWeight: 'bold',
-    },
-    touch: {
+    touch:{
         margin: 5,
     },
+    wrapper:{
+        zIndex: 9,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        left: 0,
+        top: 0,
+      },
+      modalContainer:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      modalText:{
+        fontSize: 18,
+        color: '#FFF',
+      },
 });
