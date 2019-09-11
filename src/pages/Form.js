@@ -55,13 +55,16 @@ export default class Form extends React.Component {
 
         PDF.fromHTML(htmlPDF, `http://localhost`).then(data => {
             //console.log(data);
-            this.setState({ uri: `data:application/pdf;base64,${data}` }, () => {this.sharePdfFile()});
+            this.setState({ uri: `data:application/pdf;base64,${data}`});
         }).catch(err => {
             console.log('error->', err);
         });
 
+
+
     }
 
+    //função para compartilhar o arquivo
     sharePdfFile = async () => {
         const shareOptions = {
             title: 'PersonaGenerator',
@@ -76,13 +79,24 @@ export default class Form extends React.Component {
             //console.log('Error =>', error);
             setResult('error: '.concat(getErrorString(error)));
         }
-        this.setState({spinner: false});
+        this.setState({ spinner: false });
         this.setState({ uri: '' });
     };
 
     controllActions = (data) => {
+        console.log('controllAction..');
         this.setState({ spinner: true });//show spinner
         this.createPDF(data);
+        this.setState({ spinner: false }, () => { 
+            this.props.navigation.navigate('Share', {
+                teste: this.state.uri,
+                item: 1,
+            });
+        });
+        
+
+        //console.log('call navigation..');
+
     }
 
     render() {
