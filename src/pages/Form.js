@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { View, Text, Image, TextInput, StyleSheet, ScrollView, Button, Picker, Alert, TouchableOpacity, Platform, PermissionsAndroid, FlatList } from 'react-native';
+import { View, Text, Image, TextInput, StyleSheet, ScrollView, Button, Picker, Alert, TouchableOpacity, FlatList, Modal, ActivityIndicator } from 'react-native';
 import logo from '../assets/img/logo.png';
 import arrImages from './img64';
 import PDF from 'rn-pdf-generator';
@@ -13,7 +13,7 @@ export default class Form extends React.Component {
         super(props);
         this.state = {
             modalVisible: false,
-            uri: '',
+            uri: null,
             avatar: [
                 { id: 0, display: "Avatar 1", name: "homem1", image: require("../assets/img/homem1.png") },
                 { id: 1, display: "Avatar 2", name: "homem2", image: require("../assets/img/homem2.png") },
@@ -31,11 +31,12 @@ export default class Form extends React.Component {
         headerTitle: (<Image source={logo} style={{ marginHorizontal: 50 }} />)
     };
 
+
     //Função responsavel por criar o PDF.
-    createPDF = (data) => {
+    createPDF = async(data) => {
+        this.setModal(!this.state.modalVisible);
         const imgSelected = arrImages.filter(({ name }) => name == data.avatar);
         const imgRD = arrImages.filter(({ name }) => name == 'logoReferencia');
-
         const htmlPDF = `<div style="margin: 0; padding: 10px; text-align: center;">
                     <img src="${imgSelected[0].base64}" style="width: 200px; height: 200px;">
                     <h1 style="color:#00db5e;">${data.nome}</h1>
@@ -54,20 +55,13 @@ export default class Form extends React.Component {
                     </div>`;
 
         PDF.fromHTML(htmlPDF, `http://localhost`).then(data => {
-            //console.log(data);
-            this.setState({ uri: `data:application/pdf;base64,${data}` }, () => {
-                this.setState({ spinner: false }, () => {
-                    this.props.navigation.navigate('Share', {
-                        teste: this.state.uri,
-                        item: 1,
-                    });
-                });
+            this.setState({ uri: `data:application/pdf;base64,${data}` }, () => {  
+                this.props.navigation.navigate('Share', { teste: this.state.uri });//proxima tela
+                this.setModal(!this.state.modalVisible);//modal load..
             });
         }).catch(err => {
             console.log('error->', err);
         });
-
-
 
     }
 
@@ -95,18 +89,12 @@ export default class Form extends React.Component {
     }
 
     controllActions = (data) => {
-        this.setState({ spinner: true });//show spinner
+        
         this.createPDF(data);
-        // this.setState({ spinner: false }, () => { 
-        //     this.props.navigation.navigate('Share', {
-        //         teste: this.state.uri,
-        //         item: 1,
-        //     });
-        // });
-
-
-        //console.log('call navigation..');
-
+        
+        
+        
+        //this.props.navigation.navigate('Share', { teste: this.state.uri });
     }
 
     render() {
@@ -366,7 +354,7 @@ const styles = StyleSheet.create({
     },
     wrapper:{
         zIndex: 9,
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(47,79,79,0.2)',
         position: 'absolute',
         width: '100%',
         height: '100%',

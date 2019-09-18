@@ -6,6 +6,9 @@ export default class ShareFile extends Component {
     constructor(props) {
         super(props);
     }
+    componentDidMount(){
+        console.log('PRONTO!');
+    }
 
     static navigationOptions = {
         headerTitle: (<Image source={logo} style={{ marginHorizontal: 50 }} />)
